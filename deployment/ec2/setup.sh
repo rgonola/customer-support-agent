@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Customer Support Agent - EC2 Deployment Setup Script
-# This script automates the deployment on AWS EC2 Ubuntu 24.04 LTS
+# Customer Support Agent - Deployment Setup Script
+# This script automates the deployment on Ubuntu 24.04 LTS
 #
 # Usage: sudo ./setup.sh
 #
@@ -9,7 +9,7 @@
 set -e  # Exit on error
 
 echo "=========================================="
-echo "Customer Support Agent - EC2 Setup"
+echo "Customer Support Agent - Ubuntu VM Setup"
 echo "=========================================="
 
 # Colors for output
@@ -139,5 +139,4 @@ echo "3. Restart service: sudo systemctl restart support-agent"
 echo "4. Check status: sudo systemctl status support-agent"
 echo "5. View logs: sudo journalctl -u support-agent -f"
 echo ""
-echo "Access your application at: http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 echo ""
