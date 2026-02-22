@@ -4,11 +4,11 @@ Generates contextual responses based on knowledge base retrieval
 """
 import logging
 from typing import Dict
-from langchain_openai import ChatOpenAI
+
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.models.schemas import CustomerSupportState
-from app.config.settings import get_settings
+from app.config.settings import get_settings, get_llm
 from app.database.vectordb import search_knowledge_base
 
 logger = logging.getLogger(__name__)
@@ -70,12 +70,8 @@ def generate_technical_response(state: CustomerSupportState) -> Dict[str, str]:
         Technical Support Response:
         """
         
-        # Initialize LLM
-        llm = ChatOpenAI(
-            model=settings.llm_model,
-            temperature=settings.llm_temperature,
-            openai_api_key=settings.openai_api_key
-        )
+        # Initialize LLM (provider resolved from settings)
+        llm = get_llm()
         
         # Generate response
         prompt = ChatPromptTemplate.from_template(TECHNICAL_PROMPT)
@@ -155,12 +151,8 @@ def generate_billing_response(state: CustomerSupportState) -> Dict[str, str]:
         Billing Support Response:
         """
         
-        # Initialize LLM
-        llm = ChatOpenAI(
-            model=settings.llm_model,
-            temperature=settings.llm_temperature,
-            openai_api_key=settings.openai_api_key
-        )
+        # Initialize LLM (provider resolved from settings)
+        llm = get_llm()
         
         # Generate response
         prompt = ChatPromptTemplate.from_template(BILLING_PROMPT)
@@ -239,12 +231,8 @@ def generate_general_response(state: CustomerSupportState) -> Dict[str, str]:
         Support Response:
         """
         
-        # Initialize LLM
-        llm = ChatOpenAI(
-            model=settings.llm_model,
-            temperature=settings.llm_temperature,
-            openai_api_key=settings.openai_api_key
-        )
+        # Initialize LLM (provider resolved from settings)
+        llm = get_llm()
         
         # Generate response
         prompt = ChatPromptTemplate.from_template(GENERAL_PROMPT)
