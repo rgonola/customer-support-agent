@@ -4,11 +4,11 @@ Analyzes customer query sentiment as Positive, Neutral, or Negative
 """
 import logging
 from typing import Dict
-from langchain_openai import ChatOpenAI
+
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.models.schemas import CustomerSupportState
-from app.config.settings import get_settings
+from app.config.settings import get_settings, get_llm
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -53,12 +53,8 @@ def analyze_sentiment(state: CustomerSupportState) -> Dict[str, str]:
     """
     
     try:
-        # Initialize LLM
-        llm = ChatOpenAI(
-            model=settings.llm_model,
-            temperature=settings.llm_temperature,
-            openai_api_key=settings.openai_api_key
-        )
+        # Initialize LLM (provider resolved from settings)
+        llm = get_llm()
         
         # Create prompt and invoke
         prompt = ChatPromptTemplate.from_template(SENTIMENT_PROMPT)
