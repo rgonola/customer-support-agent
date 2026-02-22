@@ -6,11 +6,10 @@ import os
 import logging
 from typing import List
 from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
 from langchain.docstore.document import Document
 from langchain_core.vectorstores import VectorStoreRetriever
 
-from app.config.settings import get_settings
+from app.config.settings import get_settings, get_embeddings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -64,11 +63,8 @@ def initialize_vectordb() -> VectorStoreRetriever:
         # Load documents
         documents = load_knowledge_base()
         
-        # Initialize embeddings
-        embeddings = OpenAIEmbeddings(
-            model=settings.embedding_model,
-            openai_api_key=settings.openai_api_key
-        )
+        # Initialize embeddings (provider resolved from settings)
+        embeddings = get_embeddings()
         
         # Create or load vector store
         vectordb = Chroma.from_documents(
