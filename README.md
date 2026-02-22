@@ -4,7 +4,7 @@ AI-powered customer support system with LangGraph workflow orchestration, RAG (R
 
 ## Features
 
-- 🤖 **AI-Powered Responses**: Uses OpenAI GPT-4o-mini for intelligent customer support
+- 🤖 **Multi-Provider AI**: Switch between OpenAI (GPT-4o), Google Gemini 2.0 Flash, and Anthropic Claude via a single env var
 - 🔍 **RAG with ChromaDB**: Vector database for knowledge base retrieval
 - 🎯 **Smart Routing**: Automatic categorization (Technical, Billing, General)
 - 😊 **Sentiment Analysis**: Detects customer sentiment (Positive, Neutral, Negative)
@@ -17,7 +17,10 @@ AI-powered customer support system with LangGraph workflow orchestration, RAG (R
 ### Prerequisites
 
 - AWS EC2 instance or Azure Virtual Machine (Ubuntu 24.04 LTS)
-- OpenAI API key
+- API key for your chosen LLM provider:
+  - **Gemini** (default): [Google AI Studio](https://aistudio.google.com/app/apikey)
+  - **OpenAI**: [platform.openai.com](https://platform.openai.com/api-keys)
+  - **Claude**: [console.anthropic.com](https://console.anthropic.com/)
 - Domain name (optional, for HTTPS)
 
 ### Deployment on Cloud Ubuntu VM
@@ -34,11 +37,22 @@ sudo chmod +x deployment/ec2/setup.sh
 sudo deployment/ec2/setup.sh
 ```
 
-3. **Configure your OpenAI API key:**
+3. **Configure your provider and API key:**
 ```bash
 sudo nano ~/customer-support-agent/backend/.env
-# Add: OPENAI_API_KEY=sk-your-actual-key-here
 ```
+Set your provider and the matching API key:
+
+| Provider | Key `.env` settings |
+|---|---|
+| **Gemini** (default) | `LLM_PROVIDER=gemini`, `EMBEDDING_PROVIDER=gemini`, `GOOGLE_API_KEY=...`, `LLM_MODEL=gemini-2.0-flash`, `EMBEDDING_MODEL=models/text-embedding-004` |
+| **OpenAI** | `LLM_PROVIDER=openai`, `EMBEDDING_PROVIDER=openai`, `OPENAI_API_KEY=...`, `LLM_MODEL=gpt-4o`, `EMBEDDING_MODEL=text-embedding-3-small` |
+| **Claude** | `LLM_PROVIDER=claude`, `EMBEDDING_PROVIDER=openai`, `ANTHROPIC_API_KEY=...`, `OPENAI_API_KEY=...`, `LLM_MODEL=claude-3-5-sonnet-20241022`, `EMBEDDING_MODEL=text-embedding-3-small` |
+
+> **Note:** If you switch embedding providers, delete the old vector store first so ChromaDB is rebuilt with the correct embeddings:
+> ```bash
+> rm -rf ~/customer-support-agent/backend/knowledge_base
+> ```
 
 4. **Restart the service:**
 ```bash
@@ -168,7 +182,14 @@ This structure helps separate different parts of the application for easier deve
 ## Tech Stack
 
 - **Backend**: FastAPI, Python 3.12
-- **AI**: OpenAI GPT-4o-mini, LangChain, LangGraph
+- **LLM** (switchable via `LLM_PROVIDER` env var):
+  - Google Gemini 2.0 Flash — `langchain-google-genai` (default)
+  - OpenAI GPT-4o / GPT-4o-mini — `langchain-openai`
+  - Anthropic Claude 3.5 Sonnet — `langchain-anthropic`
+- **Embeddings** (switchable via `EMBEDDING_PROVIDER` env var):
+  - Google `models/text-embedding-004` (default)
+  - OpenAI `text-embedding-3-small` / `text-embedding-3-large`
+- **Orchestration**: LangChain, LangGraph
 - **Database**: ChromaDB (vector database)
 - **Web Server**: NGINX
 - **Process Manager**: Systemd
